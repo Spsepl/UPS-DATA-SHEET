@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRIJOSHH UPS Datasheet Generator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="p-4">
+  <div class="container">
+    <div class="text-center mb-4">
+      <img src="Trijoshh logo.png" alt="TRIJOSHH Logo" style="max-height: 100px;">
+      <h2 class="mt-2">TRIJOSHH UPS Technical Datasheet Generator</h2>
+    </div>
+    <form id="datasheetForm">
+      <div class="form-group">
+        <input type="text" class="form-control" id="customerName" placeholder="Customer Name" required>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" id="companyName" placeholder="Company Name" required>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" id="location" placeholder="Location">
+      </div>
+      <div class="form-group">
+        <select class="form-control" id="product">
+          <option selected disabled>Select UPS Model</option>
+          <option>1 kVA UPS</option>
+          <option>5 kVA UPS</option>
+          <option>10 kVA UPS</option>
+          <option>30 kVA UPS</option>
+          <option>100 kVA UPS</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" id="backupTime" placeholder="Backup Time (mins)">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-control" id="batteryType" placeholder="Battery Type (e.g., LI-ION, SMF)">
+      </div>
+      <div class="form-group">
+        <textarea class="form-control" id="notes" placeholder="Notes / Custom Requirements"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Generate PDF & Excel</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('datasheetForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const customerName = document.getElementById('customerName').value;
+      const companyName = document.getElementById('companyName').value;
+      const location = document.getElementById('location').value;
+      const product = document.getElementById('product').value;
+      const backupTime = document.getElementById('backupTime').value;
+      const batteryType = document.getElementById('batteryType').value;
+      const notes = document.getElementById('notes').value;
+
+      // PDF Generation
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.addImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAR0AAACwCAMAAABaLTaDAAAAAXNSR0IArs4c6QAAACVQTFRF/////////////////////////////////////////////////////////9YPbnQAAAAd0Uk5T////////////////////////////////////AOAjXRkAAAETSURBVHja7dSxDsMgDERRt3v+96cTEmMjsiMJNBUnybmvS+8aPRe/XX66qqqp66qoq1xToRYEAAAAAAAAAAAAgFY2JHrNucLvvxzQMKjZVaRoNILHkZTP3r/vyx/PYcsVsm7vKwDWos3Os0L1Rg4dq1QjFYtDMTF1lrVpjX7nqyf7Uu/Uu5+XK/T2+1zhRaFZKOhGqQPSKiKtN7/Wa4zDd9zoKOUKbtK7rSuvBFXJkq6N6BSUCk3R8veBt+LfP79y+M9DPnUX/AAU88cS1vJSuAAAAAElFTkSuQmCC', 'PNG', 140, 10, 50, 25);
+      // doc.addImage('data:image/png;base64,...', 'PNG', 150, 10, 40, 20);
+
+      doc.setFontSize(16);
+      doc.text("TRIJOSHH® UPS Technical Datasheet", 20, 20);
+      doc.setFontSize(12);
+      doc.text(`Customer Name: ${customerName}`, 20, 40);
+      doc.text(`Company Name: ${companyName}`, 20, 50);
+      doc.text(`Location: ${location}`, 20, 60);
+      doc.text(`UPS Model: ${product}`, 20, 70);
+      doc.text(`Backup Time: ${backupTime} mins`, 20, 80);
+      doc.text(`Battery Type: ${batteryType}`, 20, 90);
+      doc.text("Notes:", 20, 100);
+      doc.text(notes, 20, 110);
+
+      // Warranty & Signature Section
+      doc.setFontSize(12);
+      doc.text("Warranty: 24 Months from date of purchase.", 20, 130);
+      doc.text("Authorized Signature:", 20, 150);
+      doc.line(70, 150, 160, 150); // signature line
+
+      // Footer
+      doc.setFontSize(10);
+      doc.text("TRIJOSHH ENERGY SOLUTIONS", 20, 280);
+      doc.text("Email: sales@shreeprarambha.com | Phone: 09594347775 / 09769979724", 20, 285);
+
+      doc.save(`${companyName}_Datasheet.pdf`);
+
+      // Excel Generation
+      const wb = XLSX.utils.book_new();
+      const ws_data = [
+        ["Field", "Value"],
+        ["Customer Name", customerName],
+        ["Company Name", companyName],
+        ["Location", location],
+        ["UPS Model", product],
+        ["Backup Time (mins)", backupTime],
+        ["Battery Type", batteryType],
+        ["Notes", notes],
+        ["Warranty", "24 Months"],
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+      XLSX.utils.book_append_sheet(wb, ws, "DataSheet");
+      XLSX.writeFile(wb, `${companyName}_Datasheet.xlsx`);
+    });
+  </script>
+</body>
+</html>
